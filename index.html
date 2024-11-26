@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brokerage Calculator</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<style>
+body {
+background-color: #f4f6f9;
+font-family: 'Roboto', sans-serif;
+line-height: 1.6;
+color: #333;
+margin: 0;
+padding: 0;
+}
+.container {
+background-color: #fff;
+border-radius: 10px;
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+padding: 20px;
+margin-top: 20px;
+max-width: 800px;
+margin-left: auto;
+margin-right: auto;
+}
+h1 {
+font-size: 2.5rem;
+font-weight: 700;
+margin-bottom: 20px;
+color: #007bff;
+text-align: center;
+}
+.nav-tabs .nav-link {
+border: 1px solid #e9ecef;
+border-radius: 5px;
+margin-right: 5px;
+color: #007bff;
+font-weight: 600;
+}
+.nav-tabs .nav-link.active {
+background-color: #007bff;
+color: #fff;
+border-color: #007bff;
+}
+.tab-content h3 {
+font-size: 1.75rem;
+font-weight: 600;
+color: #333;
+margin-bottom: 20px;
+}
+.form-group label {
+font-weight: 600;
+color: #555;
+}
+.form-group input {
+border: 1px solid #ced4da;
+border-radius: 5px;
+padding: 10px;
+font-size: 1rem;
+transition: border-color 0.3s;
+}
+.form-group input:focus {
+border-color: #007bff;
+box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+.btn-primary {
+background-color: #007bff;
+border-color: #007bff;
+padding: 10px 20px;
+font-size: 1.25rem;
+border-radius: 5px;
+transition: background-color 0.3s, border-color 0.3s, transform 0.3s;
+}
+.btn-primary:hover {
+background-color: #0056b3;
+border-color: #0056b3;
+transform: scale(1.05); /* Scale effect on hover */
+}
+.btn-primary:active {
+transform: scale(0.95); /* Scale effect on click */
+}
+#resultIntraday, #resultDelivery {
+margin-top: 20px;
+font-size: 1rem;
+color: #333;
+border-top: 1px solid #e9ecef;
+padding-top: 15px;
+background-color: #f8f9fa;
+border-radius: 5px;
+padding: 20px;
+}
+.result-highlight {
+font-weight: 600;
+color: #007bff;
+}
+.result-label {
+font-weight: 600;
+color: #555;
+}
+.fade-in {
+animation: fadeIn 1s ease-in-out;
+}
+@keyframes fadeIn {
+from { opacity: 0; }
+to { opacity: 1; }
+}
+</style>
+</head>
+<body>
+<div class="container mt-3">
+<h1>Brokerage Calculator</h1>
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+<li class="nav-item">
+<a class="nav-link active" id="intraday-tab" data-toggle="tab" href="#intraday" role="tab">Intraday</a>
+</li>
+<li class="nav-item">
+<a class="nav-link" id="delivery-tab" data-toggle="tab" href="#delivery" role="tab">Delivery</a>
+</li>
+</ul>
+<div class="tab-content" id="myTabContent">
+<div class="tab-pane fade show active" id="intraday" role="tabpanel"><br>
+<h3>Intraday Calculation</h3>
+<div class="form-group">
+<label for="quantityIntraday">Quantity:</label>
+<input type="number" class="form-control" id="quantityIntraday">
+</div>
+<div class="form-group">
+<label for="buyPriceIntraday">Buy Price:</label>
+<input type="number" class="form-control" id="buyPriceIntraday">
+</div>
+<div class="form-group">
+<label for="sellPriceIntraday">Sell Price:</label>
+<input type="number" class="form-control" id="sellPriceIntraday">
+</div>
+<button onclick="calculateIntradayBrokerage()" class="btn btn-primary">Calculate</button>
+<div id="resultIntraday" class="mt-3"></div>
+</div>
+<div class="tab-pane fade" id="delivery" role="tabpanel"><br>
+<h3>Delivery Calculation</h3>
+<div class="form-group">
+<label for="quantityDelivery">Quantity:</label>
+<input type="number" class="form-control" id="quantityDelivery">
+</div>
+<div class="form-group">
+<label for="buyPriceDelivery">Buy Price:</label>
+<input type="number" class="form-control" id="buyPriceDelivery">
+</div>
+<div class="form-group">
+<label for="sellPriceDelivery">Sell Price:</label>
+<input type="number" class="form-control" id="sellPriceDelivery">
+</div>
+<button onclick="calculateDeliveryBrokerage()" class="btn btn-primary">Calculate</button>
+<div id="resultDelivery" class="mt-3"></div>
+</div>
+</div>
+</div>
+<script>
+function calculateIntradayBrokerage() {
+const quantity = parseFloat(document.getElementById('quantityIntraday').value);
+const buyPrice = parseFloat(document.getElementById('buyPriceIntraday').value);
+const sellPrice = parseFloat(document.getElementById('sellPriceIntraday').value);
+if (isNaN(quantity) || isNaN(buyPrice) || isNaN(sellPrice)) {
+document.getElementById('resultIntraday').textContent = "Please enter valid values.";
+return;
+}
+const brokerageRate = 0.03 / 100;
+const stt_cttRate = 0.025 / 100;
+const tcRate = 0.00345 / 100;
+const gstRate = 18 / 100;
+const sebiChargesRate = 10 / 10000000;
+const stampChargesRate = 0.003 / 100;
+const buyTurnover = buyPrice * quantity;
+const sellTurnover = sellPrice * quantity;
+const brokerage = Math.min(brokerageRate * buyTurnover, 20) + Math.min(brokerageRate * sellTurnover, 20);
+const stt_ctt = Math.ceil(stt_cttRate * sellTurnover);
+const tc = (tcRate * buyTurnover) + (tcRate * sellTurnover);
+const buyBrokeragePlusTc = Math.min(brokerageRate * buyTurnover, 20) + (tcRate * buyTurnover);
+const sellBrokeragePlusTc = Math.min(brokerageRate * sellTurnover, 20) + (tcRate * sellTurnover);
+const gst = (gstRate * buyBrokeragePlusTc) + (gstRate * sellBrokeragePlusTc);
+const sebiCharges = (sebiChargesRate * buyTurnover) + (sebiChargesRate * sellTurnover);
+const stampCharges = stampChargesRate * buyTurnover;
+const totalCharges = brokerage + stt_ctt + tc + gst + sebiCharges + stampCharges;
+const breakEvenPoint = totalCharges / quantity;
+const netBuyValue = buyTurnover + stampCharges;
+const netSellValue = sellTurnover - (brokerage + stt_ctt + tc + gst + sebiCharges);
+const netPnL = netSellValue - netBuyValue;
+
+document.getElementById('resultIntraday').innerHTML =
+    `<table class="table">
+                    <tr><th>Net Buy Value:</th><td class="result-highlight">₹${netBuyValue.toFixed(2)}</td></tr>
+            <tr><th>Net Sell Value:</th><td class="result-highlight">₹${netSellValue.toFixed(2)}</td></tr>
+            <tr><th>Net P&L:</th><td class="result-highlight">₹${netPnL.toFixed(2)}</td></tr>
+            <tr><th>Brokerage:</th><td class="result-highlight">₹${brokerage.toFixed(2)}</td></tr>
+            <tr><th>STT/CTT:</th><td class="result-highlight">₹${stt_ctt.toFixed(2)}</td></tr>
+            <tr><th>Transaction Charges:</th><td class="result-highlight">₹${tc.toFixed(2)}</td></tr>
+            <tr><th>GST:</th><td class="result-highlight">₹${gst.toFixed(2)}</td></tr>
+            <tr><th>SEBI Charges:</th><td class="result-highlight">₹${sebiCharges.toFixed(2)}</td></tr>
+            <tr><th>Stamp Charges:</th><td class="result-highlight">₹${stampCharges.toFixed(2)}</td></tr>
+            <tr><th>Total Charges:</th><td class="result-highlight">₹${totalCharges.toFixed(2)}</td></tr>
+            <tr><th>Break-Even Point:</th><td class="result-highlight">₹${breakEvenPoint.toFixed(2)}</td></tr>
+    </table>`;
+
+    document.getElementById('resultIntraday').classList.add('fade-in');
+}
+
+function calculateDeliveryBrokerage() {
+    const quantity = parseFloat(document.getElementById('quantityDelivery').value);
+    const buyPrice = parseFloat(document.getElementById('buyPriceDelivery').value);
+    const sellPrice = parseFloat(document.getElementById('sellPriceDelivery').value);
+    if (isNaN(quantity) || isNaN(buyPrice) || isNaN(sellPrice)) {
+        document.getElementById('resultDelivery').textContent = "Please enter valid values.";
+        return;
+    }
+    const brokerageRate = 0.03 / 100;
+    const stt_cttRate = 0.1 / 100;
+    const tcRate = 0.00345 / 100;
+    const gstRate = 18 / 100;
+    const sebiChargesRate = 10 / 10000000;
+    const stampChargesRate = 0.015 / 100;
+    const buyTurnover = buyPrice * quantity;
+    const sellTurnover = sellPrice * quantity;
+    const brokerage = Math.min(brokerageRate * buyTurnover, 20) + Math.min(brokerageRate * sellTurnover, 20);
+    const stt_ctt = Math.ceil((stt_cttRate * buyTurnover) + (stt_cttRate * sellTurnover));
+    const tc = (tcRate * buyTurnover) + (tcRate * sellTurnover);
+    const gst = gstRate * tc;
+    const sebiCharges = (sebiChargesRate * buyTurnover) + (sebiChargesRate * sellTurnover);
+    const stampCharges = stampChargesRate * buyTurnover;
+    const totalCharges = stt_ctt + tc + gst + sebiCharges + stampCharges;
+    const breakEvenPoint = totalCharges / quantity;
+    const netBuyValue = buyTurnover + stampCharges;
+    const netSellValue = sellTurnover - (stt_ctt + tc + gst + sebiCharges);
+    const netPnL = netSellValue - netBuyValue;
+
+    document.getElementById('resultDelivery').innerHTML =
+        `<table class="table">
+            <tr><th>Net Buy Value:</th><td class="result-highlight">₹${netBuyValue.toFixed(2)}</td></tr>
+            <tr><th>Net Sell Value:</th><td class="result-highlight">₹${netSellValue.toFixed(2)}</td></tr>
+            <tr><th>Net P&L:</th><td class="result-highlight">₹${netPnL.toFixed(2)}</td></tr>
+            <tr><th>Brokerage:</th><td class="result-highlight">₹${brokerage.toFixed(2)}</td></tr>
+            <tr><th>STT/CTT:</th><td class="result-highlight">₹${stt_ctt.toFixed(2)}</td></tr>
+            <tr><th>Transaction Charges:</th><td class="result-highlight">₹${tc.toFixed(2)}</td></tr>
+            <tr><th>GST:</th><td class="result-highlight">₹${gst.toFixed(2)}</td></tr>
+            <tr><th>SEBI Charges:</th><td class="result-highlight">₹${sebiCharges.toFixed(2)}</td></tr>
+            <tr><th>Stamp Charges:</th><td class="result-highlight">₹${stampCharges.toFixed(2)}</td></tr>
+            <tr><th>Total Charges:</th><td class="result-highlight">₹${totalCharges.toFixed(2)}</td></tr>
+            <tr><th>Break-Even Point:</th><td class="result-highlight">₹${breakEvenPoint.toFixed(2)}</td></tr>
+    </table>`;
+
+    document.getElementById('resultDelivery').classList.add('fade-in');
+}
+</script>
+</body>
+</html>
